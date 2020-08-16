@@ -2,6 +2,9 @@ import asyncio
 import discord
 from discord.ext import commands
 import json
+import time
+
+##################################### Everything within only happens if the config.json doesn't exist
 
 try:
     with open("config.json", "r") as file:
@@ -9,47 +12,74 @@ try:
 except FileNotFoundError:
     x = {
       "USER_TOKEN1": "YOUR TOKEN HERE",
-      "USER_TOKEN2": "OPTIONAL SECOND TOKEN",
       "SAFE_MODE": False,
       "PREFIX": "dep.",
+      "INVITE": "https://discord.gg/wCfUgSK",
+      "SPOOF_TOKEN": False,
+      "ANTI_BAN": False,
+      "UNUSED": None,
+      "UNUSED1": None,
+      "UNUSED2": None,
       "UNUSED3": None,
       "UNUSED4": None,
-      "UNUSED5": None
+      "UNUSED5": None,
+      "UNUSED6": None,
+      "UNUSED7": None,
     }
 
     with open("config.json", "w") as file:
         json.dump(x, file, indent=4)
+try:
+    length = 0
+    with open("macro.json", 'r') as mac:
+        macros = []
+        for x in mac:
+            macros.append(x)
+            length += 1
+        macros = macros[2:(length - 2)]
 
 
+except FileNotFoundError:
+    x = {
+      "MACROS":
+          [
+              "rs", "https://recoverysaints.net",
+              "soar", "https://soaritic.us",
+              "empty example", "when adding more, dont forget to put a comma here >"
+          ]
+    }
 
-#with open("config.json", "r") as configFile:
-#    configData = json.load(configFile)
-#    token = configData["USER_TOKENS"]
+    with open("macro.json", "w") as mac:
+        json.dump(x, mac, indent=4)
 
+#####################################
 
-but = discord.Client()
-started = False
-global prefix, invite
-prefix = "dep."
-invite = "https://discord.gg/wCfUgSK"
+# Reading config file and assigning all required variables
+with open("config.json", "r") as configFile:
+    global prefix, invite, safeMode
+    configData = json.load(configFile)
+    tokens = configData["USER_TOKENS"]
+    prefix = configData["PREFIX"]
+    safeMode = configData["SAFE_MODE"]
+    invite = configData["INVITE"]
 
-tokens = ["NjM4NDk0ODUwODYxMzY3Mjk2.XqcWrQ.J0IAzqU_lyClCrdW1282JyO4bRo",
-          "Njc2MjI1MDcyMjgwNzY0NDUw.Xqyzaw.0wcaHbmdy7emnOE2t4z6OyxGt2I"]
+shownIntro = False
 
 class SelfBot(commands.Cog):
     def __init__(self, client):
-        global afk, soar, annoyUsers, but, started
-
-        annoyUsers = []
-        but = client
+        global shownIntro
         self.client = client
-        if not started:
+        if not shownIntro:
             print("|||||||||||||||||||||||||||||||||||||||||||||||||||||")
             print("")
             print("         DepressoSelfBot by Soariticus#0666          ")
+            if safeMode:
+                print("                 SafeMode Enabled                  ")
+            else:
+                print("")
             print("")
             print("|||||||||||||||||||||||||||||||||||||||||||||||||||||")
-            started = True
+            shownIntro = True
 
     @commands.command()
     async def ping(self, ctx):
@@ -70,6 +100,7 @@ class SelfBot(commands.Cog):
 
     @commands.command()
     async def gping(self, ctx):
+        await ctx.message.delete()
         print(f"Gping command used. ({prefix}gping [user] [amount of times])")
         con = ctx.message.content.split()  # Make it so we can read the arguments
         amt = 0
@@ -126,13 +157,62 @@ class SelfBot(commands.Cog):
        await ctx.send(f"added {ctx.message.mentions[0]} to annoylist")
        await ctx.send(f"full list = {annoyUsers}")
 
+    @commands.command()
+    async def credits(self, ctx):
+        if safeMode:
+            await ctx.send("**DepressoSelfBot by Soariticus#0666 | https://discord.gg/wCfUgSK | https://soaritic.us |**")
+        if not safeMode:
+            embed = discord.Embed(color=0xFCFF00)
+            embed.add_field(name="Depresso SelfBot", value="By Soariticus#0666", inline=False)
+            embed.add_field(name="Discord", value="https://discord.gg/wCfUgSK", inline=True)
+            embed.add_field(name="Website", value="https://soaritic.us", inline=True)
+            await ctx.send(embed=embed)
+
+    @commands.command()
+    async def mac(self, ctx):
+        args = ctx.message.content.split()
+        await ctx.message.delete()
+        yes = stop = False
+        msg = args[1]
+        i = 0
+        for x in macros:
+            if yes:
+                if not stop:
+                    new = x.replace("\"", "")
+                    await ctx.send(new.replace(",", ""))
+                    yes = False
+                    stop = True
+            if msg in x:
+                if (i % 2) != 0:
+                    pass
+                else:
+                    yes = True
+            i += 1
+
+    @commands.command()
+    async def latency(self, ctx):
+        await ctx.message.delete()
+        before = time.monotonic()
+        message = await ctx.send("Calculating...")
+        ping = (time.monotonic() - before) * 1000
+        if safeMode:
+            await message.edit(content=f"Latency: `{int(ping)}ms`")
+        if not safeMode:
+            embed = discord.Embed()
+            embed.add_field(name="Latency", value=f"{int(ping)}ms")
+            await message.edit(embed=embed, content="")
+
+
+
 loop = asyncio.get_event_loop()
+try:
+    for i in range(len(tokens)):
+        client = commands.Bot(command_prefix="dep.", help_command=None, self_bot=True)
+        client.add_cog(SelfBot(client))
 
-for i in range(len(tokens)):
-    client = commands.Bot(command_prefix="dep.", help_command=None, self_bot=True)
-    client.add_cog(SelfBot(client))
-
-    loop.create_task(client.start(tokens[i], bot=False))
+        loop.create_task(client.start(tokens[i], bot=False))
+except TypeError:
+    print("No token found, please open config.json and fill in at least USER_TOKEN1")
 
 loop.run_forever()
 
