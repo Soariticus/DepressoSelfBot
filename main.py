@@ -211,11 +211,26 @@ class SelfBot(commands.Cog):
             embed.add_field(name="Latency", value=f"{int(ping)}ms")
             await message.edit(embed=embed, content="")
 
+    @commands.command()
+    async def poll(self, ctx):
+        await ctx.message.delete()
+        cont = ctx.message.content.split()
+        if not safeMode:
+            embed = discord.Embed()
+            embed.add_field(name="Poll:", value=" ".join(cont[1:]))
+            newMessage = await ctx.send(embed=embed)
+        if safeMode:
+            newMessage = await ctx.send(" ".join(cont[1:]))
+        reactions = ['✅', '❌', '🤷']
+        for emoji in reactions:
+            await newMessage.add_reaction(emoji)
+
+
 
 loop = asyncio.get_event_loop()
 try:
     for i in range(len(tokens)):
-        client = commands.Bot(command_prefix="dep.", help_command=None, self_bot=True)
+        client = commands.Bot(command_prefix=prefix, help_command=None, self_bot=True)
         client.add_cog(SelfBot(client))
 
         loop.create_task(client.start(tokens[i], bot=False))
