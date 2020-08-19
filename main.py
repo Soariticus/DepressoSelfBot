@@ -10,14 +10,16 @@ try:
     with open("config.json", "r") as file:
         pass
 except FileNotFoundError:
+    print("Config file not found, creating new one...")
+
     x = {
-      "USER_TOKEN1": "YOUR TOKEN HERE",
+      "USER_TOKENS": ["YOUR TOKEN HERE"],
       "SAFE_MODE": False,
       "PREFIX": "dep.",
       "INVITE": "https://discord.gg/wCfUgSK",
       "SPOOF_TOKEN": False,
       "ANTI_BAN": False,
-      "UNUSED": None,
+      "UNUSED0": None,
       "UNUSED1": None,
       "UNUSED2": None,
       "UNUSED3": None,
@@ -29,6 +31,8 @@ except FileNotFoundError:
 
     with open("config.json", "w") as file:
         json.dump(x, file, indent=4)
+        print("Config file created, please fill in your tokens and restart the bot.")
+        exit()
 try:
     length = 0
     with open("macro.json", 'r') as mac:
@@ -55,13 +59,18 @@ except FileNotFoundError:
 #####################################
 
 # Reading config file and assigning all required variables
-with open("config.json", "r") as configFile:
-    global prefix, invite, safeMode
-    configData = json.load(configFile)
-    tokens = configData["USER_TOKENS"]
-    prefix = configData["PREFIX"]
-    safeMode = configData["SAFE_MODE"]
-    invite = configData["INVITE"]
+try:
+    with open("config.json", "r") as configFile:
+        global prefix, invite, safeMode, heightUnit, weightUnit
+        configData = json.load(configFile)
+        tokens = configData["USER_TOKENS"]
+        prefix = configData["PREFIX"]
+        safeMode = configData["SAFE_MODE"]
+        invite = configData["INVITE"]
+except:
+    print("Something is wrong with your config.json file, we suggest deleting it and having "
+          "the bot create the file anew.")
+    exit()
 
 shownIntro = False
 
@@ -201,7 +210,6 @@ class SelfBot(commands.Cog):
             embed = discord.Embed()
             embed.add_field(name="Latency", value=f"{int(ping)}ms")
             await message.edit(embed=embed, content="")
-
 
 
 loop = asyncio.get_event_loop()
