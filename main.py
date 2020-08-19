@@ -3,6 +3,10 @@ import discord
 from discord.ext import commands
 import json
 import time
+from currency_converter import CurrencyConverter
+import requests
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 ##################################### Everything within only happens if the config.json doesn't exist
 
@@ -81,7 +85,7 @@ class SelfBot(commands.Cog):
         if not shownIntro:
             print("|||||||||||||||||||||||||||||||||||||||||||||||||||||")
             print("")
-            print("         DepressoSelfBot by Soariticus#0666          ")
+            print("    DepressoSelfBot by Soariticus / 0x0000ff#5455      ")
             if safeMode:
                 print("                 SafeMode Enabled                  ")
             else:
@@ -224,6 +228,40 @@ class SelfBot(commands.Cog):
         reactions = ['✅', '❌', '🤷']
         for emoji in reactions:
             await newMessage.add_reaction(emoji)
+
+    @commands.command()
+    async def btcworth(self, ctx):
+        await ctx.message.delete()
+        url = "https://www.bitstamp.net/api/ticker/"
+        try:
+            r = requests.get(url)
+            priceFloat = float(json.loads(r.text)["last"])
+            if not safeMode:
+                embed = discord.Embed()
+                embed.add_field(name="BTC Current Value:", value=f"${str(priceFloat)}/BTC")
+                await ctx.send(embed=embed)
+            if safeMode:
+                await ctx.send(f"BTC Current Value: **${str(priceFloat)}**/BTC.")
+        except requests.ConnectionError:
+            print("Something went wrong fetching BTC value, try again.")
+
+    @commands.command()
+    async def curcon(self, ctx):
+        await ctx.message.delete()
+        args = ctx.message.content.split()
+        c = CurrencyConverter('http://www.ecb.europa.eu/stats/eurofxref/eurofxref.zip')
+        result = c.convert(float(args[1]), args[2], args[3])
+
+        if not safeMode:
+            embed = discord.Embed()
+            embed.add_field(name="Currency Converter", value=f"{args[2]} to {args[3]} convertion", inline=False)
+            embed.add_field(name=f"Value in {args[2]}", value=f"{args[1]}", inline=False)
+            embed.add_field(name=f"Value in {args[3]}", value=f"{result}", inline=False)
+            await ctx.send(embed=embed)
+
+        if safeMode:
+            await ctx.send(f"Conversion of {args[2]} to {args[3]}; {args[1]}{args[2]} is **{result}{args[3]}**")
+
 
 
 
