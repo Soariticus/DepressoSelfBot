@@ -3,7 +3,6 @@ import discord
 from discord.ext import commands
 import json
 import time
-import requests
 
 ##################################### Everything within only happens if the config.json doesn't exist
 
@@ -82,7 +81,7 @@ class SelfBot(commands.Cog):
         if not shownIntro:
             print("|||||||||||||||||||||||||||||||||||||||||||||||||||||")
             print("")
-            print("    Depresso SelfBot by Soariticus / 0x0000ff#5455         ")
+            print("         DepressoSelfBot by Soariticus#0666          ")
             if safeMode:
                 print("                 SafeMode Enabled                  ")
             else:
