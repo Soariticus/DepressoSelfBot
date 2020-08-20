@@ -249,20 +249,23 @@ class SelfBot(commands.Cog):
     async def curcon(self, ctx):
         await ctx.message.delete()
         args = ctx.message.content.split()
-        c = CurrencyConverter('http://www.ecb.europa.eu/stats/eurofxref/eurofxref.zip')
-        result = c.convert(float(args[1]), args[2], args[3])
+        try:
+            value = float(args[1])
+            startCur = args[2].upper()
+            endCur = args[3].upper()
+        except ValueError:
+            print(f"Your message || {ctx.message.content} || was not in the proper format.")
 
+        c = CurrencyConverter('http://www.ecb.europa.eu/stats/eurofxref/eurofxref.zip')
+        result = c.convert(value, startCur, endCur)
         if not safeMode:
             embed = discord.Embed()
-            embed.add_field(name="Currency Converter", value=f"{args[2]} to {args[3]} convertion", inline=False)
-            embed.add_field(name=f"Value in {args[2]}", value=f"{args[1]}", inline=False)
-            embed.add_field(name=f"Value in {args[3]}", value=f"{result}", inline=False)
+            embed.add_field(name="Currency Converter", value=f"{startCur} to {endCur} convertion", inline=False)
+            embed.add_field(name=f"Value in {startCur}", value=f"{value}", inline=False)
+            embed.add_field(name=f"Value in {endCur}", value=f"{result}", inline=False)
             await ctx.send(embed=embed)
-
         if safeMode:
-            await ctx.send(f"Conversion of {args[2]} to {args[3]}; {args[1]}{args[2]} is **{result}{args[3]}**")
-
-
+            await ctx.send(f"Conversion of {startCur} to {endCur}; {value} {startCur} is **{result}{endCur}**")
 
 
 loop = asyncio.get_event_loop()
@@ -276,10 +279,3 @@ except TypeError:
     print("No token found, please open config.json and fill in at least USER_TOKEN1")
 
 loop.run_forever()
-
-
-
-
-
-
-
