@@ -6,6 +6,9 @@ import time
 from currency_converter import CurrencyConverter
 import requests
 import ssl
+import functions
+import random
+
 ssl._create_default_https_context = ssl._create_unverified_context
 
 ##################################### Everything within only happens if the config.json doesn't exist
@@ -172,11 +175,12 @@ class SelfBot(commands.Cog):
 
     @commands.command()
     async def credits(self, ctx):
+        await ctx.message.delete()
         if safeMode:
             await ctx.send("**DepressoSelfBot by Soariticus#0666 | https://discord.gg/wCfUgSK | https://soaritic.us |**")
         if not safeMode:
-            embed = discord.Embed(color=0xFCFF00)
-            embed.add_field(name="Depresso SelfBot", value="By Soariticus#0666", inline=False)
+            embed = discord.Embed(color=random.randint(0, 16777215))
+            embed.add_field(name="Depresso SelfBot", value="By Soariticus / 0x0000ff#5455", inline=False)
             embed.add_field(name="Discord", value="https://discord.gg/wCfUgSK", inline=True)
             embed.add_field(name="Website", value="https://soaritic.us", inline=True)
             await ctx.send(embed=embed)
@@ -207,7 +211,7 @@ class SelfBot(commands.Cog):
         await ctx.message.delete()
         before = time.monotonic()
         message = await ctx.send("Calculating...")
-        ping = (time.monotonic() - before) * 1000
+        ping = (time.monotonic() - before) * 100
         if safeMode:
             await message.edit(content=f"Latency: `{int(ping)}ms`")
         if not safeMode:
