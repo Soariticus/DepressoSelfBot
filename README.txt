@@ -1,8 +1,14 @@
+This SelfBot for discord was written by myself due to myself and a few friends all suddenly getting a surge of inspiration to use SelfBots. Despite being against TOS, they were fun to toy around with and see what you can do with it.
+
+My selfbot ended up seeing a lot of use, having ~60 users at its prime. Below was the simple guide I wrote for users to use to set up the bot.
+
+----
+
 Depresso Selfbot
 
 Thanks for using Depresso Selfbot!!
 
-Support discord: https://discord.gg/XUqayE
+Support discord: [NO LONGER SUPPORTED]
 
 To get started, run the program, it will then create config.json and macro.json.
 
